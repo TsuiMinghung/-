@@ -105,16 +105,16 @@ public class Sin extends TriFunction {
         JointList result = new JointList();
         if (exp == 0) {
             result.addJoint(new Joint(Constant.zero()));
-            return result;
         } else if (exp == 1) {
             result.addJoint(new Joint(toCos()));
             result = JointList.multiply(result,factor.derive(var));
-            return result;
         } else {
-            result.addJoint(new Joint(basicSin().toCos()));
-            result = JointList.multiply(result,factor.derive(var));
-            result = JointList.multiply(result,lessOne().derive(var));
-            return result;
+            Joint lhs = new Joint(basicSin());
+            Joint rhs = new Joint(lessOne());
+            result.addJoint(lhs);
+            result = JointList.multiply(result,rhs.derive(var));
+            result.addAll(JointList.multiply(new JointList(rhs),lhs.derive(var)));
         }
+        return result;
     }
 }

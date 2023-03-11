@@ -107,20 +107,18 @@ public class Cos extends TriFunction {
         JointList result = new JointList();
         if (exp == 0) {
             result.addJoint(new Joint(Constant.zero()));
-            return result;
         } else if (exp == 1) {
             Joint tmp = new Joint(toSin());
             tmp.multiplyConstant(Constant.minusOne());
             result.addJoint(tmp);
             result = JointList.multiply(result,factor.derive(var));
-            return result;
         } else {
-            Joint tmp = new Joint(basicCos().toSin());
-            tmp.multiplyConstant(Constant.minusOne());
-            result.addJoint(tmp);
-            result = JointList.multiply(result,factor.derive(var));
-            result = JointList.multiply(result,lessOne().derive(var));
-            return result;
+            Joint lhs = new Joint(basicCos());
+            Joint rhs = new Joint(lessOne());
+            result.addJoint(lhs);
+            result = JointList.multiply(result,rhs.derive(var));
+            result.addAll(JointList.multiply(new JointList(rhs),lhs.derive(var)));
         }
+        return result;
     }
 }

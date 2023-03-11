@@ -10,7 +10,6 @@ public class DiffFactor extends Factor {
         collapse();
     }
 
-
     //used for clone
     public DiffFactor(DiffFactor other) {
         this.lexer = other.lexer;

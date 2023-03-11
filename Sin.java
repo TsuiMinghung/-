@@ -16,6 +16,18 @@ public class Sin extends TriFunction {
         this.factor = other.factor.clone();
     }
 
+    public Sin(Expr factor,int exp) {
+        this.lexer = null;
+        this.factor = factor;
+        this.exp = exp;
+    }
+
+    public Sin(Expr factor) {
+        this.lexer = null;
+        exp = 1;
+        this.factor = factor;
+    }
+
     @Override
     public void parse() {
         lexer.sin();
@@ -75,5 +87,34 @@ public class Sin extends TriFunction {
             tmp = "(" + factor.simplify() + ")";
         }
         return "sin(" + tmp + ")" + (exp == 1 ? "" : "**" + exp);
+    }
+
+    public Cos toCos() {
+        return new Cos(factor.clone());
+    }
+
+    public Sin lessOne() {
+        return new Sin(this.factor.clone(),exp - 1);
+    }
+
+    public Sin basicSin() {
+        return new Sin(this.factor.clone(),1);
+    }
+
+    public JointList derive(String var) {
+        JointList result = new JointList();
+        if (exp == 0) {
+            result.addJoint(new Joint(Constant.zero()));
+            return result;
+        } else if (exp == 1) {
+            result.addJoint(new Joint(toCos()));
+            result = JointList.multiply(result,factor.derive(var));
+            return result;
+        } else {
+            result.addJoint(new Joint(basicSin().toCos()));
+            result = JointList.multiply(result,factor.derive(var));
+            result = JointList.multiply(result,lessOne().derive(var));
+            return result;
+        }
     }
 }

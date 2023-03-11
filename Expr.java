@@ -136,4 +136,11 @@ public class Expr implements Simplify,Parsable,Collapse {
     public boolean onlyPower() {
         return collapse().onlyPower();
     }
+
+    public JointList derive(String var) {
+        if (jl == null) {
+            collapse();
+        }
+        return jl.derive(var);
+    }
 }

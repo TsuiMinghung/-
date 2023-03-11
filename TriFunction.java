@@ -10,6 +10,8 @@ public abstract class TriFunction extends VarFactor {
 
     public abstract void multiply(TriFunction triFunction);
 
+    public abstract JointList derive(String var);
+
     @Override
     public JointList collapse() {
         JointList result = new JointList();

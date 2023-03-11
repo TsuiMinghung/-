@@ -16,6 +16,12 @@ public class Power extends VarFactor {
         base = String.copyValueOf(other.base.toCharArray());
     }
 
+    public Power(String base,int exp) {
+        this.lexer = null;
+        this.base = base;
+        this.exp = exp;
+    }
+
     public String getBase() {
         return base;
     }
@@ -73,5 +79,21 @@ public class Power extends VarFactor {
     @Override
     public boolean isZero() {
         return false;
+    }
+
+    public Power lessOne() {
+        return new Power(base,exp - 1);
+    }
+
+    public JointList derive(String var) {
+        JointList result = new JointList();
+        if (var.equals(base)) {
+            Joint tmp = new Joint(new Constant(exp));
+            tmp.multiplyPow(lessOne());
+            result.addJoint(tmp);
+        } else {
+            result.addJoint(new Joint(Constant.zero()));
+        }
+        return result;
     }
 }

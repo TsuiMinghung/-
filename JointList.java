@@ -25,6 +25,11 @@ public class JointList implements Simplify {
         contents = new ArrayList<>();
     }
 
+    public JointList(Joint j) {
+        this.contents = new ArrayList<>();
+        this.contents.add(j);
+    }
+
     //used for clone
     public JointList(JointList other) {
         contents = new ArrayList<>();
@@ -162,5 +167,13 @@ public class JointList implements Simplify {
             }
         }
         return other.contents.size() == contents.size();
+    }
+
+    public JointList derive(String var) {
+        JointList result = new JointList();
+        for (Joint j : contents) {
+            result.addAll(j.derive(var).clone());
+        }
+        return result;
     }
 }

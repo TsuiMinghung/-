@@ -17,6 +17,8 @@ public abstract class Factor implements Simplify, Parsable, Collapse {
             return new ExprFactor(lexer);
         } else if (Character.isDigit(lexer.current().charAt(0)) || "+-".contains(lexer.current())) {
             return new Constant(lexer);
+        } else if (lexer.current().equals("d")) {
+            return new DiffFactor(lexer);
         } else {
             return VarFactor.getInstance(lexer);
         }

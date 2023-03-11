@@ -111,7 +111,10 @@ public class Term implements Simplify,Parsable,Collapse {
     }
 
     public boolean equals(Term other) {
-        //System.err.println("Term equals");
         return collapse().equals(other.collapse());
+    }
+
+    public JointList derive(String var) {
+        return jl.derive(var);
     }
 }

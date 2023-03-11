@@ -1,9 +1,11 @@
+import jdk.nashorn.internal.scripts.JO;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Joint implements Simplify {
 
-    public static Joint multiply(Joint j1,Joint j2) {
+    public static Joint multiply(Joint j1, Joint j2) {
         Joint result = j1.clone();
         result.multiply(j2);
         return result;
@@ -45,6 +47,15 @@ public class Joint implements Simplify {
         };
     }
 
+    public Joint(List<TriFunction> triFunctions) {
+        this.constant = Constant.one();
+        this.powers = new ArrayList<>();
+        this.triFunctions = new ArrayList<>();
+        for (TriFunction t : triFunctions) {
+            this.triFunctions.add(t.clone());
+        }
+    }
+
     //used for clone
     public Joint(Joint other) {
         constant = other.constant.clone();
@@ -56,6 +67,15 @@ public class Joint implements Simplify {
         for (TriFunction t : other.triFunctions) {
             triFunctions.add(t.clone());
         }
+    }
+
+    public Joint(Constant c, List<Power> ps) {
+        this.constant = c.clone();
+        this.powers = new ArrayList<>();
+        for (Power p : ps) {
+            this.powers.add(p.clone());
+        }
+        this.triFunctions = new ArrayList<>();
     }
 
     public void multiply(Joint other) {
@@ -269,7 +289,7 @@ public class Joint implements Simplify {
             return "";
         }
         StringBuilder result = new StringBuilder(powers.get(0).simplify());
-        for (int i = 1;i < powers.size();++i) {
+        for (int i = 1; i < powers.size(); ++i) {
             result.append("*").append(powers.get(i).simplify());
         }
         return result.toString();
@@ -280,7 +300,7 @@ public class Joint implements Simplify {
             return "";
         }
         StringBuilder result = new StringBuilder(triFunctions.get(0).simplify());
-        for (int i = 1;i < triFunctions.size();++i) {
+        for (int i = 1; i < triFunctions.size(); ++i) {
             result.append("*").append(triFunctions.get(i).simplify());
         }
         return result.toString();
@@ -292,5 +312,42 @@ public class Joint implements Simplify {
 
     public boolean onlyPower() {
         return constant.isOne() && triFunctions.isEmpty() && powers.size() == 1;
+    }
+
+    public JointList derive(String var) {
+        JointList result = new JointList();
+        if (onlyNumber()) {
+            result.addJoint(new Joint(Constant.zero()));
+        } else if (triFunctions.isEmpty()) {
+            Power p = powerFind(var);
+            if (p != null) {
+                Joint tmp = new Joint(constant);
+                for (Power power : powers) {
+                    if (!power.baseEquals(p.getBase())) {
+                        tmp.multiplyPow(power);
+                    }
+                }
+                result.addJoint(tmp);
+                result = JointList.multiply(result, p.derive(var));
+            } else {
+                result.addJoint(new Joint(Constant.zero()));
+            }
+        } else if (powers.isEmpty() && constant.isOne()) {
+            if (triFunctions.size() == 1) {
+                return triFunctions.get(0).derive(var);
+            }
+            Joint lhs = new Joint(triFunctions.get(0));
+            Joint rhs = new Joint(triFunctions.subList(1,triFunctions.size()));
+            result.addJoint(lhs);
+            result = JointList.multiply(result,rhs.derive(var));
+            result.addAll(JointList.multiply(new JointList(rhs),lhs.derive(var)));
+        } else {
+            Joint lhs = new Joint(constant, powers);
+            Joint rhs = new Joint(triFunctions);
+            result.addJoint(rhs);
+            result = JointList.multiply(result, lhs.derive(var));
+            result.addAll(JointList.multiply(new JointList(lhs), rhs.derive(var)));
+        }
+        return result;
     }
 }

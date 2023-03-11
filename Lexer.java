@@ -23,7 +23,7 @@ public class Lexer {
         char c;
         while (stringIndex < input.length()) {
             c = input.charAt(stringIndex);
-            if ("xyz()+-fgh,".indexOf(c) != -1) {
+            if ("xyz()+-fgh,d".indexOf(c) != -1) {
                 tokens.add(Character.toString(c));
                 ++stringIndex;
             } else if (c == '*') {
@@ -173,5 +173,10 @@ public class Lexer {
             System.err.println("comma error");
             exit(1);
         }
+    }
+
+    public void diff() {
+        assert current().equals("d");
+        next();
     }
 }

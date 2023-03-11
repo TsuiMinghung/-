@@ -5,12 +5,18 @@ public class Constant extends Factor {
     private static final Constant ZERO = new Constant(BigInteger.ZERO);
     private static final Constant ONE = new Constant(BigInteger.ONE);
 
+    private static final Constant MINUSONE = new Constant(BigInteger.ONE.negate());
+
     public static Constant zero() {
         return ZERO.clone();
     }
 
     public static Constant one() {
         return ONE.clone();
+    }
+
+    public static Constant minusOne() {
+        return MINUSONE.clone();
     }
 
     private BigInteger value;
@@ -24,6 +30,11 @@ public class Constant extends Factor {
     public Constant(Lexer lexer) {
         this.lexer = lexer;
         parse();
+    }
+
+    public Constant(int value) {
+        lexer = null;
+        this.value = new BigInteger(String.valueOf(value));
     }
 
     //used for clone
@@ -84,6 +95,12 @@ public class Constant extends Factor {
     public JointList collapse() {
         JointList result = new JointList();
         result.addJoint(new Joint(this));
+        return result;
+    }
+
+    public JointList derive(String var) {
+        JointList result = new JointList();
+        result.addJoint(new Joint(Constant.zero()));
         return result;
     }
 }

@@ -72,6 +72,9 @@ public class DiffFactor extends Factor {
 
     @Override
     public JointList collapse() {
-        return expr.collapse().derive(var);
+        if (jl == null) {
+            jl = expr.collapse().derive(var);
+        }
+        return jl;
     }
 }
